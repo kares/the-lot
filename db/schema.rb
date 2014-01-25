@@ -10,7 +10,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140125102145) do
+ActiveRecord::Schema.define(version: 20140125132632) do
+
+  create_table "tasks", force: true do |t|
+    t.string   "name",         null: false
+    t.integer  "user_id",      null: false
+    t.datetime "completed_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "users", force: true do |t|
     t.string   "name",       null: false
