@@ -10,3 +10,5 @@ set :database, ENV['DATABASE_URL'] || begin
   # PGUSER, PGPASSWORD, PGHOST will be picked up automatically
   "#{adapter}:///#{ENV['PGDATABASE'] || 'the-lot'}?pool=#{pool}"
 end
+
+ActiveRecord::Base.include_root_in_json = false
