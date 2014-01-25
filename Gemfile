@@ -8,7 +8,8 @@ source 'https://rubygems.org'
 #end
 
 gem 'activerecord', '~> 4.0.0'
-gem 'pg', :platform => :mri
+gem 'pg', :platform => :mri, :require => nil
+gem 'sqlite3', :platform => :mri, :require => nil
 
 gem 'rake', :require => nil
 
