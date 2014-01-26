@@ -2,30 +2,64 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>Ember Starter Kit</title>
+<title>The-Lot (a.k.a. TODO)</title>
   <link rel="stylesheet" href="css/normalize.css">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+
   <script type="text/x-handlebars">
-    <h2>Welcome to Ember.js</h2>
+    <h2>The-Lot (TODO) App</h2>
 
     {{outlet}}
   </script>
 
-  <script type="text/x-handlebars" id="index">
-    <ul>
-    {{#each item in model}}
-      <li>{{item}}</li>
-    {{/each}}
-    </ul>
+  <script type="text/x-handlebars" data-template-name="tasks">
+    <section id="task-app">
+      <header id="header">
+        {{input id="new-task" type="text" value=newName action="createTask" placeholder=" ... "}}
+      </header>
+
+      <section id="main">
+        <ul id="task-list">
+          {{#each currentTasks itemController="task"}}
+            <li {{bind-attr class="completed:completed editModel:editMode"}}>
+                {{#if editModel}}
+                  {{edit-task class="edit" value=originalName focus-out="confirmEdit" insert-newline="confirmEdit" escape-press="cancelEdit"}}
+                {{else}}
+                  {{input type="checkbox" class="toggle" checked=completed}}
+                  <label {{action "editTask" on="doubleClick"}}>{{name}}</label>
+                  <button {{action "removeTask"}} class="destroy"></button>
+                {{/if}}
+            </li>
+          {{/each}}
+        </ul>
+      </section>
+
+      <footer id="footer">
+          <div id="filters">
+            <span>
+                {{#link-to "tasks.index" activeClass="selected"}}all{{/link-to}}
+            </span>
+            <span>
+                {{#link-to "tasks.active" activeClass="selected"}}active{{/link-to}}
+            </span>
+            <span>
+                {{#link-to "tasks.completed" activeClass="selected"}}completed{{/link-to}}
+            </span>
+          </ul>
+      </footer>
+    </section>
   </script>
 
   <script src="js/libs/jquery-1.10.2.js"></script>
   <script src="js/libs/handlebars-1.1.2.js"></script>
   <script src="js/libs/ember-1.3.1.js"></script>
+  <script src="js/libs/ember-data.js"></script>
+  <script src="js/libs/localstorage_adapter.js"></script>
   <script src="js/app.js"></script>
+
   <!-- to activate the test runner, add the "?test" query string parameter -->
-  <script src="tests/runner.js"></script>
+  <!--<script src="tests/runner.js"></script>-->
 </body>
 </html>
