@@ -17,9 +17,9 @@ App.TaskSerializer = App.Serializer.extend({
     }
 });
 
-
 App.Router.map(function () {
-    this.resource('tasks', { path: '/' }, function () {
+    this.route("login", { path: "/" });
+    this.resource('tasks', { path: '/tasks' }, function () {
         this.route('active'); this.route('completed');
     });
 });
@@ -54,19 +54,6 @@ App.TasksCompletedRoute = Ember.Route.extend({
 App.Task = DS.Model.extend({
     name: DS.attr('string'),
     completed: DS.attr('boolean'),
-    /*
-    completedAt: DS.attr('date'),
-
-    completed: function(key, value) {
-        if ( arguments.length > 1 ) { // setter
-            this._completed = value;
-        }
-        if (this._completed == null) {
-            this._completed = !! this.get('completedAt');
-        }
-        return this._completed;
-    }.property('completedAt'),
-    _completed: null, // internal */
 
     saveWhenCompletedChanged: function () { this.save(); }.observes('completed')
 });
@@ -140,3 +127,44 @@ App.EditTaskView = Ember.TextField.extend({
 });
 
 Ember.Handlebars.helper('edit-task', App.EditTaskView);
+
+// User/Auth
+
+App.User = Ember.Object.extend({
+    username: null, password: null,
+    name: function() {
+        return this.get('username');
+    }.property('username')
+});
+
+App.userName = null;
+
+App.LoginController = Ember.ObjectController.extend({
+    actions: {
+        login: function() {
+            var user = this.get('model'); var self = this;
+            var data = JSON.stringify({ username: user.get('username'), password: user.get('password') });
+            $.post('/login', data).
+                done(function() {
+                    App.userName = user.get('name');
+                    self.transitionToRoute("tasks");
+                }).
+                fail(function() {
+                    // TODO maybe print something
+                });
+        },
+        signup: function() {
+            var user = this.get('model'); var self = this;
+            var data = JSON.stringify({ username: user.get('username'), password: user.get('password') });
+            $.post('/signup', data).
+                done(function() {
+                    App.userName = user.get('name');
+                    self.transitionToRoute("tasks");
+                });
+        }
+    }
+});
+
+App.LoginRoute = Ember.Route.extend({
+    model: function() { return new App.User; }
+});

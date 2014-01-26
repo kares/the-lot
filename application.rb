@@ -20,23 +20,15 @@ def logger; settings.logger; end
 helpers do
 
   def current_user # user or raise
-    name = 'default' # DRAFT
-    return User.where(name: name).take || begin
-      user = User.create!(name: name)
-      user.tasks.create! name: 'wash dishes'
-      user
-    end
-
-
-    if session[:current_user]
-      set_current_user User.find(session[:current_user])
+    if session[:user_id]
+      set_current_user User.find(session[:user_id])
     else
       current_user? ? @current_user : halt(401)
     end
   end
 
   def current_user?
-    return true if session[:current_user]
+    return true if session[:user_id]
     @auth ||= Rack::Auth::Basic::Request.new(request.env)
     if @auth.provided? && @auth.basic? && @auth.credentials
       set_current_user User.auth( *@auth.credentials ) # [ name, password ]
@@ -45,10 +37,10 @@ helpers do
 
   def set_current_user(user)
     if user
-      session[:current_user] = user.id
+      session[:user_id] = user.id
       @current_user = user
     else
-      session.delete(:current_user); @current_user = nil
+      session.delete(:user_id); @current_user = nil
     end
   end
 
@@ -94,12 +86,17 @@ get '/login' do
 end
 
 post '/login' do
-  # TODO NOT IMPLEMENTED
-  status 200
+  if user = User.auth( post_params['username'], post_params['password'] )
+    set_current_user user
+    status 200
+  else
+    status 401
+  end
 end
 
 post '/logout' do
-  # TODO NOT IMPLEMENTED
+  set_current_user nil
+  status 200
 end
 
 # Task API

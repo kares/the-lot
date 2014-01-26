@@ -17,6 +17,10 @@
   <script type="text/x-handlebars" data-template-name="tasks">
     <section id="task-app">
       <header id="header">
+        <div>
+          <h3 style="display: inline">Greetings {{App.userName}}!</h3>
+          <!--<a href="#" {{action logout}}>logout</a>-->
+        </div>
         {{input id="new-task" type="text" value=newName action="createTask" placeholder=" ... "}}
       </header>
 
@@ -29,7 +33,7 @@
                 {{else}}
                   {{input type="checkbox" class="toggle" checked=completed}}
                   <label {{action "editTask" on="click"}} title="click to edit">{{name}}</label>
-                  <button {{action "removeTask"}} class="destroy" title="remove task">x</button>
+                  <button {{action "removeTask"}} style="font-size: small" class="destroy" title="remove task">x</button>
                 {{/if}}
             </li>
           {{/each}}
@@ -44,6 +48,20 @@
           </ul>
       </footer>
     </section>
+  </script>
+
+  <script type="text/x-handlebars" data-template-name="login">
+    <form id="login">
+      <label>
+        <p>Username: {{view Ember.TextField valueBinding="content.username" placeholder=""}}</p>
+      </label>
+      <label>
+        <p>Password: {{view Ember.TextField valueBinding="content.password" placeholder="(optional)"}}</p>
+      </label>
+      <p>
+        <button {{action login}}>login</button> or <button {{action signup}}>signup</button>
+      </p>
+    </form>
   </script>
 
   <script src="js/libs/jquery-1.10.2.js"></script>

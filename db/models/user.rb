@@ -2,21 +2,21 @@ class User < ActiveRecord::Base
 
   validates_presence_of :name
 
-  has_many :tasks
+  alias_attribute :username, :name
 
-  @@default_user = nil
-  def self.default
-    @@default_user ||= begin
-      User.new('default')
-    end
-  end
+  has_many :tasks
 
   #def self.by_name(name)
   #  where(:name => name).take || create!(:name => name)
   #end
 
+  def self.auth(username, password = nil)
+    user = where(:name => username).take
+    return user if user && ( password.nil? || password == user[:password] )
+  end
+
   def all_tasks
-    tasks.all
+    tasks.to_a
   end
 
   def find_task(id)
