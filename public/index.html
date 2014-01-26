@@ -24,12 +24,12 @@
         <ul id="task-list">
           {{#each currentTasks itemController="task"}}
             <li {{bind-attr class="completed:completed editModel:editMode"}}>
-                {{#if editModel}}
+                {{#if editMode}}
                   {{edit-task class="edit" value=originalName focus-out="confirmEdit" insert-newline="confirmEdit" escape-press="cancelEdit"}}
                 {{else}}
                   {{input type="checkbox" class="toggle" checked=completed}}
-                  <label {{action "editTask" on="doubleClick"}}>{{name}}</label>
-                  <button {{action "removeTask"}} class="destroy"></button>
+                  <label {{action "editTask" on="click"}} title="click to edit">{{name}}</label>
+                  <button {{action "removeTask"}} class="destroy" title="remove task">x</button>
                 {{/if}}
             </li>
           {{/each}}
@@ -38,15 +38,9 @@
 
       <footer id="footer">
           <div id="filters">
-            <span>
-                {{#link-to "tasks.index" activeClass="selected"}}all{{/link-to}}
-            </span>
-            <span>
-                {{#link-to "tasks.active" activeClass="selected"}}active{{/link-to}}
-            </span>
-            <span>
-                {{#link-to "tasks.completed" activeClass="selected"}}completed{{/link-to}}
-            </span>
+            <span>{{#link-to "tasks.index" activeClass="selected"}}all{{/link-to}}</span>
+            <span>{{#link-to "tasks.active" activeClass="selected"}}active{{/link-to}}</span>
+            <span>{{#link-to "tasks.completed" activeClass="selected"}}completed{{/link-to}}</span>
           </ul>
       </footer>
     </section>
