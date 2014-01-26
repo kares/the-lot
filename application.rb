@@ -13,28 +13,29 @@ configure :development do
   register Sinatra::Reloader
 end
 
+def logger; settings.logger; end
+
 # Authentication
 
 helpers do
 
-  def protected!
-    return if authorized?
-    headers['WWW-Authenticate'] = 'Basic realm="Restricted Area"'
-    halt 401, "Not authorized\n"
-  end
-
   def current_user # user or raise
     name = 'default' # DRAFT
-    User.where(name: name).take || begin
+    return User.where(name: name).take || begin
       user = User.create!(name: name)
       user.tasks.create! name: 'wash dishes'
       user
     end
+
+
+    if session[:current_user]
+      set_current_user User.find(session[:current_user])
+    else
+      current_user? ? @current_user : halt(401)
+    end
   end
 
   def current_user?
-    return true if true # DRAFT
-
     return true if session[:current_user]
     @auth ||= Rack::Auth::Basic::Request.new(request.env)
     if @auth.provided? && @auth.basic? && @auth.credentials
@@ -44,9 +45,10 @@ helpers do
 
   def set_current_user(user)
     if user
-      session[:current_user] = user
+      session[:current_user] = user.id
+      @current_user = user
     else
-      session.delete(:current_user); nil
+      session.delete(:current_user); @current_user = nil
     end
   end
 
@@ -56,10 +58,35 @@ get '/' do
   send_file File.join(settings.public_folder, 'index.html') # redirect '/index.html'
 end
 
+helpers do
+
+  #require 'active_model/serializer'
+  #
+  #def serializer(resource, resource_name = nil)
+  #  serializer = ActiveModel::Serializer.serializer_for(resource)
+  #  options = {}
+  #  options[:resource_name] = resource_name if resource_name
+  #  serializer.new(resource, options)
+  #end
+
+  def post_params
+    @post_params ||= JSON.parse(request.body.read)
+  end
+
+end
+
 # TODO validations - return 422 on errors and handle on client
 
 post '/signup' do
-  User.create! :name => params['name'], :password => params['password']
+  unless user_params = post_params['user']
+    user_params = { name: params['name'], password: params['password'] }
+  end
+  if user_params.empty?
+    status 422
+  else
+    set_current_user User.create!(user_params)
+    status 201
+  end
 end
 
 get '/login' do
@@ -77,18 +104,9 @@ end
 
 # Task API
 
-def task_params
-  task = {}
-  ['name', 'completed'].each do |name|
-    task[name.to_sym] = params[name] if params.key?(name)
-  end
-  task
-end
-
 get '/tasks' do
-  tasks = current_user.all_tasks.to_json
-  puts tasks.inspect
-  tasks
+  tasks = current_user.all_tasks
+  { tasks: tasks }.to_json
 end
 
 get '/tasks/:id' do
@@ -96,14 +114,22 @@ get '/tasks/:id' do
 end
 
 post '/tasks' do
-  current_user.tasks.create! task_params
-  status 204
+  logger.debug "POST task params: #{post_params.inspect}"
+
+  if (task_params = post_params['task']).empty?
+    status 400
+  else
+    current_user.tasks.create! task_params
+    status 201
+  end
 end
 
 put '/tasks/:id' do
+  logger.debug "PUT task params: #{post_params.inspect}"
+
   task = current_user.find_task(params['id'])
-  if (task_params = self.task_params).empty?
-    status 200 # 304 maybe ?
+  if (task_params = post_params['task']).empty?
+    status 202
   else
     task.update_attributes! task_params
     status 204
