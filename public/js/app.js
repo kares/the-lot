@@ -1,6 +1,22 @@
 App = Ember.Application.create();
 
-App.ApplicationAdapter = DS.LSAdapter.extend({ namespace: 'the-lot' }); // local-storage
+//App.ApplicationAdapter = DS.LSAdapter.extend({ namespace: 'the-lot' }); // local-storage
+//App.ApplicationAdapter = DS.JsonApiAdapter;
+
+App.Serializer = DS.RESTSerializer;
+App.TaskSerializer = App.Serializer.extend({
+    normalize: function (type, hash, property) {
+        // TODO why do we get this messed ... ?!
+        if ( hash['task'] ) hash = hash['task'];
+        var data = {};
+        // normalize the underscored properties
+        for (var prop in hash) {
+            data[prop.camelize()] = hash[prop];
+        }
+        return this._super(type, data, property);
+    }
+});
+
 
 App.Router.map(function () {
     this.resource('tasks', { path: '/' }, function () {

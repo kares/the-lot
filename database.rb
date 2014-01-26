@@ -11,4 +11,4 @@ set :database, ENV['DATABASE_URL'] || begin
   "#{adapter}:///#{ENV['PGDATABASE'] || 'the-lot'}?pool=#{pool}"
 end
 
-ActiveRecord::Base.include_root_in_json = false
+ActiveRecord::Base.include_root_in_json = true
