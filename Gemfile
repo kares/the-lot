@@ -1,11 +1,11 @@
 #ruby=1.9.3
 source 'https://rubygems.org'
-#if defined? JRUBY_VERSION
+if defined? JRUBY_VERSION
 # https://devcenter.heroku.com/articles/ruby-support#ruby-versions
-#ruby '1.9.3', engine: 'jruby', engine_version: '1.7.6'
-#else
-#ruby '1.9.3'
-#end
+ruby '1.9.3', engine: 'jruby', engine_version: '1.7.10'
+else
+ruby '1.9.3'
+end
 
 gem 'activerecord', '~> 4.0.0'
 gem 'pg', :platform => :mri, :require => nil
@@ -15,6 +15,8 @@ gem 'rake', :require => nil
 
 gem 'rack', '~> 1.5.2'
 gem 'sinatra', '~> 1.4.4'
+
+gem 'sinatra-contrib', :require => nil, :group => :development
 
 gem 'sinatra-activerecord', '~> 1.2.3'
 

@@ -18,6 +18,7 @@ GEM
       tzinfo (~> 0.3.37)
     arel (4.0.1)
     atomic (1.1.14)
+    backports (3.4.0)
     builder (3.1.4)
     daemons (1.1.9)
     eventmachine (1.0.3)
@@ -28,6 +29,8 @@ GEM
     rack (1.5.2)
     rack-protection (1.5.2)
       rack
+    rack-test (0.6.2)
+      rack (>= 1.0)
     rake (10.1.1)
     sinatra (1.4.4)
       rack (~> 1.4)
@@ -36,6 +39,13 @@ GEM
     sinatra-activerecord (1.2.3)
       activerecord (>= 3.0)
       sinatra (~> 1.0)
+    sinatra-contrib (1.4.2)
+      backports (>= 2.0)
+      multi_json
+      rack-protection
+      rack-test
+      sinatra (~> 1.4.0)
+      tilt (~> 1.3)
     sqlite3 (1.3.8)
     thin (1.6.1)
       daemons (>= 1.0.9)
@@ -56,5 +66,6 @@ DEPENDENCIES
   rake
   sinatra (~> 1.4.4)
   sinatra-activerecord (~> 1.2.3)
+  sinatra-contrib
   sqlite3
   thin
