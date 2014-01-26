@@ -2,23 +2,64 @@ require './database'
 require './db/models/user'
 require './db/models/task'
 
-# Authentication
+# Configuration
 
-def current_user # user or raise
-  User.new(:name => 'default', :created_at => Time.current) # DRAFT
+enable :sessions, :logging, :static, :method_override
+set :public_folder, 'public'
+set :session_secret, 'saso-vesia-osusku' * 3
+
+configure :development do
+  require 'sinatra/reloader'
+  register Sinatra::Reloader
 end
 
-def current_user?
-  return true # DRAFT
-  session[:current_user]
+# Authentication
+
+helpers do
+
+  def protected!
+    return if authorized?
+    headers['WWW-Authenticate'] = 'Basic realm="Restricted Area"'
+    halt 401, "Not authorized\n"
+  end
+
+  def current_user # user or raise
+    name = 'default' # DRAFT
+    User.where(name: name).take || begin
+      user = User.create!(name: name)
+      user.tasks.create! name: 'wash dishes'
+      user
+    end
+  end
+
+  def current_user?
+    return true if true # DRAFT
+
+    return true if session[:current_user]
+    @auth ||= Rack::Auth::Basic::Request.new(request.env)
+    if @auth.provided? && @auth.basic? && @auth.credentials
+      set_current_user User.auth( *@auth.credentials ) # [ name, password ]
+    end
+  end
+
+  def set_current_user(user)
+    if user
+      session[:current_user] = user
+    else
+      session.delete(:current_user); nil
+    end
+  end
+
 end
 
 get '/' do
-  if current_user?
-    redirect to('/tasks')
-  else
-    redirect to('/login')
-  end
+  send_file File.join(settings.public_folder, 'index.html') # redirect '/index.html'
+end
+
+# TODO validations - return 422 on errors and handle on client
+
+post '/signup' do
+  User.create! :name => params['name'], :password => params['password']
 end
 
 get '/login' do
@@ -38,14 +79,16 @@ end
 
 def task_params
   task = {}
-  ['name', 'completed', ''].each do |name|
+  ['name', 'completed'].each do |name|
     task[name.to_sym] = params[name] if params.key?(name)
   end
   task
 end
 
 get '/tasks' do
-  current_user.all_tasks.to_json
+  tasks = current_user.all_tasks.to_json
+  puts tasks.inspect
+  tasks
 end
 
 get '/tasks/:id' do
