@@ -106,11 +106,11 @@ end
 
 get '/tasks' do
   tasks = current_user.all_tasks
-  { tasks: tasks }.to_json
+  { tasks: tasks }.to_json methods: :completed
 end
 
 get '/tasks/:id' do
-  current_user.find_task(params['id']).to_json
+  current_user.find_task(params['id']).to_json methods: :completed
 end
 
 post '/tasks' do

@@ -54,6 +54,19 @@ App.TasksCompletedRoute = Ember.Route.extend({
 App.Task = DS.Model.extend({
     name: DS.attr('string'),
     completed: DS.attr('boolean'),
+    /*
+    completedAt: DS.attr('date'),
+
+    completed: function(key, value) {
+        if ( arguments.length > 1 ) { // setter
+            this._completed = value;
+        }
+        if (this._completed == null) {
+            this._completed = !! this.get('completedAt');
+        }
+        return this._completed;
+    }.property('completedAt'),
+    _completed: null, // internal */
 
     saveWhenCompletedChanged: function () { this.save(); }.observes('completed')
 });
