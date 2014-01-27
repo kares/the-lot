@@ -18,14 +18,31 @@ App.TaskSerializer = App.Serializer.extend({
 });
 
 App.Router.map(function () {
-    this.route("login", { path: "/" });
-    this.resource('tasks', { path: '/tasks' }, function () {
+    //this.route("index", { path: "/" });
+    this.route("login", { path: "/login" });
+    this.resource('tasks', { path: '/' }, function () {
         this.route('active'); this.route('completed');
     });
 });
 
 App.TasksRoute = Ember.Route.extend({
-    model: function () { return this.store.find('task'); }
+    model: function () { return this.store.find('task'); },
+    beforeModel: function() {
+        if ( ! App.userName ) {
+            var self = this;
+            $.ajax({ // GET /login
+                url: '/login',
+                async: false,
+                dataType: 'json',
+                success: function(data) {
+                    App.userName = data['user']['name'];
+                },
+                error: function() {
+                    self.transitionTo('login');
+                }
+            });
+        }
+    }
 });
 App.TasksIndexRoute = Ember.Route.extend({
     setupController: function () {
