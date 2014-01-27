@@ -71,8 +71,12 @@ App.TasksCompletedRoute = Ember.Route.extend({
 App.Task = DS.Model.extend({
     name: DS.attr('string'),
     completed: DS.attr('boolean'),
+    priority: DS.attr('number'),
 
-    saveWhenCompletedChanged: function () { this.save(); }.observes('completed')
+    //getId: function () { return this.get('id'); },
+
+    saveWhenCompletedChanged: function () { this.save(); }.observes('completed'),
+    saveWhenPriorityChanged: function () { this.save(); }.observes('priority')
 });
 
 App.TasksController = Ember.ArrayController.extend({
@@ -99,8 +103,44 @@ App.TasksController = Ember.ArrayController.extend({
 
     completed: function () {
         return this.filterProperty('completed', true).get('length');
-    }.property('@each.completed')
+    }.property('@each.completed'),
 
+    sortProperties: [ 'priority' ], sortAscending: true,
+
+    updateSortOrder: function(indexes) {
+        
+        console.log('updateSortOrder', indexes);
+
+        this.beginPropertyChanges();
+        this.forEach(function(item) {
+
+            console.log('item: ', item, item.get('id'));
+
+            var index = indexes[ item.get('id') ];
+            item.set('priority', index);
+        }, this);
+        this.endPropertyChanges();
+    }
+
+});
+
+App.TasksView = Ember.View.extend({
+    didInsertElement: function() {
+        var controller = this.get('controller');
+        this.$("#task-list").sortable({
+            update: function() {
+                var indexes = {};
+                $(this).find('.task').each(function(index) {
+                    indexes[ $(this).data('id') ] = index;
+                });
+                controller.updateSortOrder(indexes);
+            }
+        });
+    }
+});
+
+Handlebars.registerHelper('modelId', function(options) {
+    return options.data.view.content.get('id'); // model.get('id')
 });
 
 App.TaskController = Ember.ObjectController.extend({

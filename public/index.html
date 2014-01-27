@@ -31,12 +31,12 @@
       <section id="main">
         <ul id="task-list">
           {{#each currentTasks itemController="task"}}
-            <li {{bind-attr class="completed:completed editMode:editMode"}}>
+            <li class="task" {{bind-attr class="completed:completed editMode:editMode"}} data-id="{{modelId}}">
                 {{#if editMode}}
                   {{edit-task class="edit" value=originalName focus-out="confirmEdit" insert-newline="confirmEdit" escape-press="cancelEdit"}}
                 {{else}}
                   {{input type="checkbox" class="toggle" checked=completed}}
-                  <label {{action "editTask" on="click"}} title="click to edit">{{name}}</label>
+                  <label {{action "editTask" on="doubleClick"}} title="double-click to edit">{{name}}</label>
                   <button {{action "removeTask"}} style="font-size: small" class="destroy" title="remove task">x</button>
                 {{/if}}
             </li>
@@ -69,6 +69,7 @@
   </script>
 
   <script src="js/libs/jquery-1.10.2.js"></script>
+  <script src="js/libs/jquery-ui-1.10.4.js"></script>
   <script src="js/libs/handlebars-1.1.2.js"></script>
   <script src="js/libs/ember-1.3.1.js"></script>
   <script src="js/libs/ember-data.js"></script>
