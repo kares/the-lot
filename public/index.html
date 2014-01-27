@@ -14,6 +14,10 @@
     {{outlet}}
   </script>
 
+  <script type="text/x-handlebars" data-template-name="index">
+
+  </script>
+
   <script type="text/x-handlebars" data-template-name="tasks">
     <section id="task-app">
       <header id="header">
@@ -27,7 +31,7 @@
       <section id="main">
         <ul id="task-list">
           {{#each currentTasks itemController="task"}}
-            <li {{bind-attr class="completed:completed editModel:editMode"}}>
+            <li {{bind-attr class="completed:completed editMode:editMode"}}>
                 {{#if editMode}}
                   {{edit-task class="edit" value=originalName focus-out="confirmEdit" insert-newline="confirmEdit" escape-press="cancelEdit"}}
                 {{else}}
@@ -56,7 +60,7 @@
         <p>Username: {{view Ember.TextField valueBinding="content.username" placeholder=""}}</p>
       </label>
       <label>
-        <p>Password: {{view Ember.TextField valueBinding="content.password" placeholder="(optional)"}}</p>
+        <p>Password: {{view Ember.TextField type="password" valueBinding="content.password" placeholder="(optional)"}}</p>
       </label>
       <p>
         <button {{action login}}>login</button> or <button {{action signup}}>signup</button>
