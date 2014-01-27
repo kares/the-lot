@@ -1,11 +1,11 @@
 #ruby=1.9.3
 source 'https://rubygems.org'
-if defined? JRUBY_VERSION
+#if defined? JRUBY_VERSION
 # https://devcenter.heroku.com/articles/ruby-support#ruby-versions
 ruby '1.9.3', engine: 'jruby', engine_version: '1.7.10'
-else
-ruby '1.9.3'
-end
+#else
+#ruby '1.9.3'
+#end
 
 gem 'activerecord', '~> 4.0.0'
 gem 'activerecord-jdbc-adapter', :platform => :jruby
