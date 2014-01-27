@@ -1,0 +1,3 @@
+#!/usr/bin/env jruby
+#require 'bundler/setup'
+load Gem.bin_path('trinidad', 'trinidad')

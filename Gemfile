@@ -8,6 +8,8 @@ ruby '1.9.3'
 end
 
 gem 'activerecord', '~> 4.0.0'
+gem 'activerecord-jdbc-adapter', :platform => :jruby
+gem 'jdbc-postgres', :platform => :jruby
 gem 'pg', :platform => :mri, :require => nil
 gem 'sqlite3', :platform => :mri, :require => nil
 
@@ -22,6 +24,7 @@ gem 'sinatra-activerecord', '~> 1.2.3'
 
 group :server do
   gem 'thin', :require => false, :platform => :mri
+  gem 'trinidad', :require => false, :platform => :jruby
 end
 
 # heroku config:add JRUBY_OPTS="--1.9 -J-Xmx400m -J-XX:+UseCompressedOops -J-noverify"
