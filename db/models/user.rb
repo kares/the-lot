@@ -4,7 +4,7 @@ class User < ActiveRecord::Base
 
   alias_attribute :username, :name
 
-  has_many :tasks
+  has_many :tasks, -> { order('priority ASC, created_at ASC') }
 
   #def self.by_name(name)
   #  where(:name => name).take || create!(:name => name)
