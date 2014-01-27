@@ -69,7 +69,7 @@ helpers do
 
 end
 
-# TODO validations - return 422 on errors and handle on client
+# TODO errors - 404 on not found & 422 on validations errors
 
 post '/signup' do
   debug "POST user params: #{post_params.inspect}"
@@ -121,11 +121,14 @@ post '/tasks' do
   debug "POST task params: #{post_params.inspect}"
 
   if (task_params = post_params['task']).empty?
-    status 400
-  else
-    current_user.tasks.create! task_params
-    status 201
+    if name = params['name']
+      task_params = { name: params['name'] }
+    else
+      status 400; return
+    end
   end
+  current_user.tasks.create! task_params
+  status 201
 end
 
 put '/tasks/:id' do
@@ -133,11 +136,14 @@ put '/tasks/:id' do
 
   task = current_user.find_task(params['id'])
   if (task_params = post_params['task']).empty?
-    status 202
-  else
-    task.update_attributes! task_params
-    status 204
+    if name = params['name']
+      task_params = { name: params['name'] }
+    else
+      status 202; return
+    end
   end
+  task.update_attributes! task_params
+  status 204
 end
 
 delete '/tasks/:id' do
