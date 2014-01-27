@@ -1,1 +1,1 @@
-web: bin/trinidad --threadsafe --rackup -p $PORT -e ${RACK_ENV:-development}
+web: bin/trinidad --threadsafe --address * --rackup -p $PORT -e ${RACK_ENV:-development}
