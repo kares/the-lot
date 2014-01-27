@@ -13,8 +13,6 @@ configure :development do
   register Sinatra::Reloader
 end
 
-def logger; settings.logger; end
-
 # Authentication
 
 helpers do
@@ -65,13 +63,22 @@ helpers do
     @post_params ||= JSON.parse(request.body.read)
   end
 
+  def debug(msg)
+    puts msg # settings.logger.debug msg
+  end
+
 end
 
 # TODO validations - return 422 on errors and handle on client
 
 post '/signup' do
+  debug "POST user params: #{post_params.inspect}"
   unless user_params = post_params['user']
-    user_params = { name: params['name'], password: params['password'] }
+    user_params = {}
+    name = post_params['username'] || params['username']
+    user_params[:name] = name if name
+    pass = post_params['password'] || params['password']
+    user_params[:password] = pass if pass
   end
   if user_params.empty?
     status 422
@@ -82,7 +89,7 @@ post '/signup' do
 end
 
 get '/login' do
-  current_user.to_json
+  current_user.to_json only: [ :id, :name, :created_at ]
 end
 
 post '/login' do
@@ -111,7 +118,7 @@ get '/tasks/:id' do
 end
 
 post '/tasks' do
-  logger.debug "POST task params: #{post_params.inspect}"
+  debug "POST task params: #{post_params.inspect}"
 
   if (task_params = post_params['task']).empty?
     status 400
@@ -122,7 +129,7 @@ post '/tasks' do
 end
 
 put '/tasks/:id' do
-  logger.debug "PUT task params: #{post_params.inspect}"
+  debug "PUT task params: #{post_params.inspect}"
 
   task = current_user.find_task(params['id'])
   if (task_params = post_params['task']).empty?

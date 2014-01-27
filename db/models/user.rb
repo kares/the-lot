@@ -12,7 +12,7 @@ class User < ActiveRecord::Base
 
   def self.auth(username, password = nil)
     user = where(:name => username).take
-    return user if user && ( password.nil? || password == user[:password] )
+    return user if user && ( password.blank? || password == user[:password] )
   end
 
   def all_tasks
