@@ -60,7 +60,10 @@ helpers do
   #end
 
   def post_params
-    @post_params ||= JSON.parse(request.body.read)
+    @post_params ||= begin
+      body = request.body.read
+      body.present? ? JSON.parse(body) : {}
+    end
   end
 
   def debug(msg)
@@ -120,7 +123,7 @@ end
 post '/tasks' do
   debug "POST task params: #{post_params.inspect}"
 
-  if (task_params = post_params['task']).empty?
+  if ( task_params = post_params['task'] ).blank?
     if name = params['name']
       task_params = { name: params['name'] }
     else
@@ -135,10 +138,11 @@ put '/tasks/:id' do
   debug "PUT task params: #{post_params.inspect}"
 
   task = current_user.find_task(params['id'])
-  if (task_params = post_params['task']).empty?
-    if name = params['name']
-      task_params = { name: params['name'] }
-    else
+  
+  if ( task_params = post_params['task'] || {} ).empty?
+    task_params[:name] = params['name'] if params['name']
+    task_params[:completed] = params['completed'].to_s == 'true' if params['completed']
+    if task_params.empty?
       status 202; return
     end
   end
